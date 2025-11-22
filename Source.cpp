@@ -13,7 +13,7 @@ using namespace std;
 
 using clk = chrono::steady_clock;
 
-// median of several runs
+
 double measure(function<void()> fn, int repeats = 7) {
     vector<double> t;
     for (int i = 0; i < repeats; i++) {
@@ -26,25 +26,25 @@ double measure(function<void()> fn, int repeats = 7) {
     return t[t.size() / 2];
 }
 
-// sequential
+
 template<class Pred>
 long long seq_cnt(const vector<int>& a, Pred p) {
     return count_if(a.begin(), a.end(), p);
 }
 
-// policy par
+
 template<class Pred>
 long long par_cnt(const vector<int>& a, Pred p) {
     return count_if(execution::par, a.begin(), a.end(), p);
 }
 
-// policy par_unseq
+
 template<class Pred>
 long long par_unseq_cnt(const vector<int>& a, Pred p) {
     return count_if(execution::par_unseq, a.begin(), a.end(), p);
 }
 
-// custom parallel K threads
+
 template<class Pred>
 long long my_parallel_cnt(const vector<int>& a, Pred p, int K) {
 
@@ -77,11 +77,11 @@ int main() {
     vector<int> Ns = { 100000, 1000000, 5000000 };
     mt19937_64 rng(123456);
 
-    // light predicate
+    
     auto pred_light = [](int x) {
         return (x & 1) == 0;
         };
-    // heavy predicate
+   
     auto pred_heavy = [](int x) {
         double s = 0;
         for (int i = 0; i < 12; i++) s += sqrt(x + i);
@@ -108,12 +108,12 @@ int main() {
 
             auto pred = pp.f;
 
-            // Sequential
+            
             long long res_seq = seq_cnt(a, pred);
             double t_seq = measure([&]() { seq_cnt(a, pred); });
             cout << "std::count_if (sequential): " << t_seq << " ms\n";
 
-            // par
+            
             double t_par = -1, t_par_unseq = -1;
             long long res_par = res_seq, res_par_unseq = res_seq;
 
@@ -135,7 +135,7 @@ int main() {
                 cout << "par_unseq policy NOT supported\n";
             }
 
-            // Custom K
+            
             cout << "\n--- custom parallel K ----\n";
             int hw = max(1u, thread::hardware_concurrency());
             vector<int> Ks = { 1, 2, 4, 8, 16, 32, 64 };
@@ -152,7 +152,7 @@ int main() {
                 double t = measure([&]() { my_parallel_cnt(a, pred, K); });
                 if (t < bestT) bestT = t, bestK = K;
 
-                // check correctness
+                
                 if (res != res_seq) {
                     cout << "ERROR: incorrect result at K=" << K << "\n";
                 }
@@ -169,3 +169,4 @@ int main() {
 
     return 0;
 }
+
